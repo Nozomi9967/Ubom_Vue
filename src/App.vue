@@ -1,28 +1,36 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <div class='item left-float' ><router-link  to="/regis">注册</router-link></div>
+    <div class='item right-float' ><router-link  to="/login">登录</router-link></div>
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
-export default {
-  name: 'App',
-  components: {
-    HelloWorld
+  import Regis from './components/Regis';
+  import Login from './components/Login';
+  export default {
+    name:"App",
+    components:{Regis,Login},
+    methods: {
+    handleOpen(key, keyPath) {
+      console.log(key, keyPath);
+    },
+    handleClose(key, keyPath) {
+      console.log(key, keyPath);
+    } 
   }
-}
+  }
 </script>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+<style scoped>
+  .item{
+    font-size: 40px;
+  }
+  .left-float{
+    float:left;
+  }
+  .right-float{
+    float:right;
+  }
 </style>
