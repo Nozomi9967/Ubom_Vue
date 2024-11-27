@@ -74,7 +74,7 @@
 <script>
 import axios from 'axios';
 export default {
-  name:'Regis',
+  name:'UserRegis',
   data() {
     return {
       User:{
