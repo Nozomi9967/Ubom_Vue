@@ -1,12 +1,7 @@
 <template>
-    <!-- <div style="text-align: center;" class="S30">
-    <span style="margin-bottom: 100px;">登录界面</span><br><br>
-    账号<input class="space" v-model="User.username" placeholder="请输入内容"><br>
-    密码<input class="space" placeholder="请输入密码" v-model="User.password" show-password><br>
-    <button class="BtnSize" @click="submitInfo">登录</button>
-  </div> -->
 
     <div>
+        
         <!--头部-->
         <div id="header">
             <!--头部中间信息-->
@@ -15,38 +10,35 @@
             </div>
         </div>
 
-
         <!--中部-->
         <div id="login_body">
             <div class="login_b_center">
                 <div class="login_bg">
                     <h1>密码登录</h1>
-                    <form action="#" id="login">
+                    <el-form  id="login">
                         <!--                //用户名-->
-                        <div class="userName">
-                            <span></span>
-                            <input class="userName" v-model="User.username" placeholder="请输入内容"
-                                @blur="handleUserNameBlur" @focus="handleUserNameFocus">
+                        <el-form-item class="userName" style="display: flex; align-items: center;">
+                            <i class="el-icon-user-solid" style="font-size: 24px;"></i>
+                            <el-input class="userName" prop="username" v-model="User.username" placeholder="请输入内容"
+                                @blur="handleUserNameBlur" @focus="handleUserNameFocus"></el-input>
                             <p v-if="showUserNameErrorMsg">用户名长度不得小于5</p>
-                        </div>
-                        <!--                //密码-->
-                        <div class="password">
-                            <span></span>
-                            <input class="password" placeholder="请输入密码" v-model="User.password" show-password
-                                @blur="handlePswBlur" @focus="handlePswFocus">
+                        </el-form-item>
+                        <!--                密码-->
+                        <el-form-item class="password" style="display: flex; align-items: center;">
+                            <i class="el-icon-lock" style="font-size: 24px;"></i>
+                            <el-input class="password" prop="passwords" placeholder="请输入密码" v-model="User.password" show-password
+                                @blur="handlePswBlur" @focus="handlePswFocus"></el-input>
                             <p v-if="showPswErrorMsg">密码长度需要在6-12区间内</p>
-                        </div>
-                        <!--                //登录按钮-->
+                        </el-form-item>
+                        <!--                登录按钮-->
                         <div class="login_btn">
-                            <!-- <a href="index.html"> -->
-                            <button class="login_btn" @click="submitInfo">登录</button>
-                            <!-- </a> -->
+                            <el-button class="login_btn" @click="submitInfo">登录</el-button>
                         </div>
                         <div class="forgot_password">
                             <!-- <router-link>忘记密码</router-link> -->
                             <router-link to="/regis">注册账号</router-link>
                         </div>
-                    </form>
+                    </el-form>
                 </div>
             </div>
         </div>
@@ -69,9 +61,22 @@ export default {
         }
 
     },
+    mounted() {
+        // 添加全局 Enter 键事件监听器
+        document.addEventListener('keydown', this.handleEnterKey);
+    },
+    beforeDestroy() {
+        // 移除全局 Enter 键事件监听器，防止内存泄漏
+        document.removeEventListener('keydown', this.handleEnterKey);
+    },
     methods: {
+        handleEnterKey(event) {
+            if (event.key == 'Enter') {
+                this.submitInfo()
+            }
+        },
         async submitInfo(event) {
-            event.preventDefault(); // 阻止表单默认提交行为
+            //event.preventDefault(); // 阻止表单默认提交行为
             const response = await axios.post('http://localhost:8080/login', this.User, {
                 headers: {
                     'Content-Type': 'application/json'
@@ -190,52 +195,6 @@ export default {
     right: -10px;
     top: 80px;
     padding: 30px;
-}
-
-#login div {
-    height: 40px;
-    margin-top: 20px;
-}
-
-#login span {
-    width: 40px;
-    height: 40px;
-    display: inline-block;
-    background: red;
-    float: left;
-    border: 1px gray;
-}
-
-#login .userName span {
-    background-image: url("./images/login.png");
-}
-
-#login .password span {
-    background-image: url("./images/password.png");
-}
-
-#login input {
-    width: 250px;
-    height: 40px;
-    float: left;
-}
-
-#login .login_btn {
-    background-color: coral;
-    width: 300px;
-    border: none;
-    color: whitesmoke;
-    float: left;
-}
-
-#login .login_btn:hover {
-    color: blue;
-    float: left;
-}
-
-#login .forgot_password {
-    text-align: right;
-    margin-top: 20px;
 }
 
 a {

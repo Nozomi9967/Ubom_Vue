@@ -1,4 +1,4 @@
-# vue_test
+# ubom_vue
 
 ## Project setup
 ```

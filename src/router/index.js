@@ -5,6 +5,7 @@ import UserRegis from "@/pages/UserRegis/UserRegis.vue"
 import MainPage from "@/pages/MainPage/MainPage.vue";
 import UserCenter from "@/pages/UserCenter/UserCenter.vue";
 import Preface from "@/pages/Preface"
+import BookStall from "@/pages/BookStall"
 
 export default new VueRouter({
   routes: [
@@ -27,6 +28,10 @@ export default new VueRouter({
     {
       path: '/preface',
       component: Preface
+    },
+    {
+      path:'/bookstall',
+      component:BookStall
     },
     {
       path: '*',

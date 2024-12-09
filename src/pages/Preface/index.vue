@@ -14,7 +14,24 @@
 
 <script>
 export default {
-
+  name:'Preface',
+  mounted() {
+    // 添加全局 Enter 键事件监听器
+    console.log('Adding keydown listener');
+    document.addEventListener('keydown', this.handleEnterKey);
+  },
+  beforeDestroy() {
+    // 移除全局 Enter 键事件监听器，防止内存泄漏
+    console.log('Removing keydown listener');
+    document.removeEventListener('keydown', this.handleEnterKey);
+  },
+  methods:{
+    handleEnterKey(event){
+      if(event.key=='Enter'){
+        this.$router.push('/login')
+      }
+    }
+  }
 }
 </script>
 

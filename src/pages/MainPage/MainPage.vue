@@ -1,8 +1,10 @@
 <template>
   <div class="mainpage">
     <el-container>
-      <el-aside width="200px">Aside</el-aside>
-      <el-main>Mainaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</el-main>
+      <el-header>
+        
+      </el-header>
+      <el-main>Main</el-main>
     </el-container>
   </div>
 </template>
@@ -29,6 +31,7 @@ export default {
       this.fetchBooks()
   },
   methods: {
+    
     async fetchBooks() {
       await axios.get('http://localhost:8080/books', {
         headers: {
