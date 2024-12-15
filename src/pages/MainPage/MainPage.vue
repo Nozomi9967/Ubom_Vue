@@ -10,7 +10,6 @@
 </template>
 
 <script>
-import axios from 'axios'
 import { mapState } from 'vuex'
 export default {
   name: 'MainPage',
@@ -27,27 +26,8 @@ export default {
   mounted() {
     console.log('MainPage mounted')
     this.$store.commit('LoadBaseInfo')
-    if (this.token)
-      this.fetchBooks()
   },
   methods: {
-    
-    async fetchBooks() {
-      await axios.get('http://localhost:8080/books', {
-        headers: {
-          token: this.token
-        }
-      }).then(
-        response => {
-          console.log('请求成功', response.data)
-          this.booksObj = response.data.data
-          // this.bookList=booksObj.records
-        },
-        error => {
-          console.log('请求失败', error.message)
-        }
-      )
-    }
   }
 }
 </script>

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-container >
+    <el-container>
       <el-header style="margin:0 auto">
         <div>
           <el-image style="width: 1200px; height: 400px"
@@ -23,15 +23,73 @@
             <h3>书摊人气榜</h3>
             <el-divider></el-divider>
             <ul>
-              <li v-for="(item,index) in soldInfo" :key="index"><span style="margin-right: 10px;">{{ index+1 }}.</span>{{ item[0] }}</li>
+              <li v-for="(item,index) in soldInfo" :key="index"><span style="margin-right: 10px;">{{ index+1
+                  }}.</span>{{ item[0] }}</li>
             </ul>
           </div>
         </el-aside>
         <el-divider direction="vertical" class="dividerHeight"></el-divider>
-        <el-main class="bookShow" >
+        <el-main class="bookShow">
+
+          <div v-for="(categoryItem,categoryIndex) in getBooks" :key="categoryIndex">
+            <span class="divisionName">{{ categoryNames[categoryIndex] }}</span><el-divider></el-divider>
+            <el-row v-for="(row, RowIndex) in categoryItem" :key="RowIndex">
+              <el-col :span="4" v-for="(item, ColIndex) in row" :key="ColIndex" class="centered-col">
+                <div class="card-container" @click="handleClickBookItem(item)">
+                  <el-card :body-style="{ padding: '0px' }" style="width:150px;">
+                    <img :src="item.image" class="image" style="width: 150px;height: 150px;">
+                    <div style="padding: 14px;">
+                      <span>{{ item.bookname }}</span>
+                      <div class="bottom clearfix">
+                        <span class="authorFont">{{ item.author }}</span>
+                      </div>
+                    </div>
+                  </el-card>
+                  <span class="price-tag">￥{{ item.price }}</span>
+                </div>
+              </el-col>
+            </el-row>
+          </div>
+
+          <el-dialog title="书籍详情" :visible.sync="dialogFormVisible" width="30%"
+          center>
+            <el-form :model="currentItem">
+              <el-form-item label="书名:" :label-width="formLabelWidth">
+                <el-input v-model="currentItem.bookname" disabled autocomplete="off"></el-input>
+              </el-form-item>
+              <el-form-item label="作者:" :label-width="formLabelWidth">
+                <el-input v-model="currentItem.author" disabled autocomplete="off"></el-input>
+              </el-form-item>
+              <el-form-item label="价格:" :label-width="formLabelWidth">
+                <el-input v-model="currentItem.price" disabled autocomplete="off"></el-input>
+              </el-form-item>
+              <el-form-item label="类型:" :label-width="formLabelWidth">
+                <el-input v-model="currentItem.type" disabled autocomplete="off"></el-input>
+              </el-form-item>
+              <el-form-item label="发布时间:" :label-width="formLabelWidth">
+                <el-input v-model="currentItem.createTime" disabled autocomplete="off"></el-input>
+              </el-form-item>
+              <el-form-item label="发布者:" :label-width="formLabelWidth">
+                <el-input v-model="currentItem.userName" disabled autocomplete="off"></el-input>
+              </el-form-item>
+              <el-form-item label="详细图片：" :label-width="formLabelWidth">
+                <el-image style="width: 100px; height: 100px" :src="currentItem.image"
+                  :preview-src-list="[currentItem.image]">
+                </el-image>
+              </el-form-item>
+              <el-form-item label="描述：:" :label-width="formLabelWidth">
+                <el-button type="info" round @click="openDescri()">点我查看</el-button>
+              </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+              <el-button @click="dialogFormVisible = false">取 消</el-button>
+              <el-button type="success" @click="handleAddToCart">添加购物车</el-button>
+              <el-button type="primary" @click="dialogFormVisible = false">购买</el-button>
+            </div>
+          </el-dialog>
 
           <!-- 教科书展示区 -->
-          <div class="textBook">
+          <!-- <div class="textBook">
             <span class="divisionName">教科书</span><el-divider></el-divider>
             <el-row v-for="(row, RowIndex) in getTextBooks" :key="RowIndex">
               <el-col :span="4" v-for="(item, ColIndex) in row" :key="ColIndex" class="centered-col">
@@ -50,10 +108,9 @@
                 </div>
               </el-col>
             </el-row>
-          </div>
-
+          </div> -->
           <!-- 历史书展示区 -->
-          <div class="historyBook">
+          <!-- <div class="historyBook">
             <span class="divisionName">历史书</span><el-divider></el-divider>
             <el-row v-for="(row, RowIndex) in getHistoryBooks" :key="RowIndex">
               <el-col :span="4" v-for="(item, ColIndex) in row" :key="ColIndex" class="centered-col">
@@ -72,10 +129,9 @@
                 </div>
               </el-col>
             </el-row>
-          </div>
-
+          </div> -->
           <!-- 传记展示区 -->
-          <div class="textBook">
+          <!-- <div class="textBook">
             <span class="divisionName">传记</span><el-divider></el-divider>
             <el-row v-for="(row, RowIndex) in getBiographyBooks" :key="RowIndex">
               <el-col :span="4" v-for="(item, ColIndex) in row" :key="ColIndex" class="centered-col">
@@ -94,10 +150,9 @@
                 </div>
               </el-col>
             </el-row>
-          </div>
-
+          </div> -->
           <!-- 科普书展示区 -->
-          <div class="textBook">
+          <!-- <div class="textBook">
             <span class="divisionName">科普书</span><el-divider></el-divider>
             <el-row v-for="(row, RowIndex) in getScienceBooks" :key="RowIndex">
               <el-col :span="4" v-for="(item, ColIndex) in row" :key="ColIndex" class="centered-col">
@@ -116,10 +171,9 @@
                 </div>
               </el-col>
             </el-row>
-          </div>
-
+          </div> -->
           <!-- 宗教书展示区 -->
-          <div class="textBook">
+          <!-- <div class="textBook">
             <span class="divisionName">宗教书</span><el-divider></el-divider>
             <el-row v-for="(row, RowIndex) in getReligionBooks" :key="RowIndex">
               <el-col :span="4" v-for="(item, ColIndex) in row" :key="ColIndex" class="centered-col">
@@ -138,10 +192,9 @@
                 </div>
               </el-col>
             </el-row>
-          </div>
-
+          </div> -->
           <!-- 小说展示区 -->
-          <div class="textBook">
+          <!-- <div class="textBook">
             <span class="divisionName">小说</span><el-divider></el-divider>
             <el-row v-for="(row, RowIndex) in getFictionBooks" :key="RowIndex">
               <el-col :span="4" v-for="(item, ColIndex) in row" :key="ColIndex" class="centered-col">
@@ -160,7 +213,7 @@
                 </div>
               </el-col>
             </el-row>
-          </div>
+          </div> -->
 
 
 
@@ -183,11 +236,33 @@ export default {
       soldInfo:{},
       chunkSize: 6,
       booksCount:0,
-      usersCount:0
+      usersCount:0,
+      categoryNames: {
+        textbooks: '教科书',
+        historyBooks: '历史书',
+        biographyBooks: '传记',  
+        scienceBooks: '科普书',
+        religionBooks: '宗教书',
+        fictionBooks: '小说'
+      },
+      dialogFormVisible:false,
+      dialogDescriVisible:false,
+      formLabelWidth:'120px',
+      currentItem:{},
     }
   },
   computed: {
     ...mapState(['token', 'userId', 'username']),
+    getBooks(){
+      return {
+        textbooks: this.getTextBooks||[],
+        historyBooks: this.getHistoryBooks||[],
+        biographyBooks: this.getBiographyBooks||[],
+        scienceBooks: this.getScienceBooks||[],
+        religionBooks: this.getReligionBooks||[],
+        fictionBooks: this.getFictionBooks||[]
+      }
+    },
 
     //将十二个数据分为两个数组，一个数组六个，便于渲染
     getTextBooks() {
@@ -252,6 +327,19 @@ export default {
 
   },
   methods: {
+    handleAddToCart(){
+      this.$store.commit('InsertShopCart',this.currentItem)
+      this.$message('添加购物车成功')
+      this.dialogFormVisible=false
+    },
+    openDescri(){
+      this.$alert(this.currentItem.description,'书籍描述')
+    },
+    handleClickBookItem(item){
+      console.log('item:',item)
+      this.currentItem=item
+      this.dialogFormVisible=true
+    },
     sortSoldInfo() {
       if (!this.soldInfo)
         return false

@@ -76,13 +76,13 @@ export default {
             }
         },
         async submitInfo(event) {
+            this.$message('正在加载中')
             //event.preventDefault(); // 阻止表单默认提交行为
             const response = await axios.post('http://localhost:8080/login', this.User, {
                 headers: {
                     'Content-Type': 'application/json'
                 }
             })
-            alert('正在加载中')
             const result = response.data
             console.log(result)
             if (result.code == 200) {
@@ -90,15 +90,18 @@ export default {
                 localStorage.setItem('token', result.data.jwt)
                 localStorage.setItem('userId', result.data.id)
                 localStorage.setItem('userName', this.User.username)
+                localStorage.setItem('avatar',result.data.avatar)
+                localStorage.setItem('balance',result.data.balance)
                 //基于内存，一刷新就没了，要存入localstorage
                 // this.$store.commit('SetJWT',result.data.jwt)
                 // this.$store.commit('SetUserId',result.data.id)
                 // this.$store.commit('SetUserName',this.User.username)
+                this.$message('登录成功')
                 this.$store.commit('AUTH')
                 this.$router.push('/mainpage')
             } else {
                 console.log('登录失败', result.message)
-                alert('登录失败');
+                this.$message('登录失败');
             }
 
         },
