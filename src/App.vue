@@ -1,7 +1,12 @@
 <template>
   <div id="app">
-    <Header :avatar="avatar" :balance="balance" :shopCart="shopCart"></Header>
-    <router-view></router-view>
+    <Header 
+    :avatar="avatar" 
+    :balance="balance" 
+    @update:balance="balance = $event" 
+    :shopCart="shopCart"
+    @refresh="handleRefresh"></Header>
+    <router-view :key="refreshKey"></router-view>
   </div>
 </template>
 
@@ -11,13 +16,16 @@ export default {
   name: "App",
   data(){
     return {
-      
+      refreshKey:0
     }
   },
   components: {
     Header
   },
   methods: {
+    handleRefresh(){
+      this.refreshKey+=1
+    }
   },
   computed: {
     avatar(){

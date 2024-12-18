@@ -192,7 +192,7 @@ export default {
 
 #login_body .login_bg {
     width: 350px;
-    height: 351px;
+    height: 380px;
     background: rgba(255, 255, 255, 0.9);
     position: absolute;
     right: -10px;

@@ -29,7 +29,7 @@
         </div>
         <!-- 余额 -->
         <div style="text-align: center;margin-top: 30px;">
-          <span class="balance">余额：￥{{ balance }}</span>
+          <span class="balance">余额：￥{{ Math.floor(balance) }}</span>
         </div>
         <!-- 功能选择 -->
         <div>
@@ -38,11 +38,12 @@
               <i class="el-icon-user-solid"></i>
               <span slot="title">个人资料</span>
             </el-menu-item>
-            <el-menu-item index="2">
+            <el-menu-item index="2" @click="handleOpenBookManagement">
               <i class="el-icon-collection"></i>
               <span slot="title">书籍管理</span>
+
             </el-menu-item>
-            <el-menu-item index="3">
+            <el-menu-item index="3" @click="handleOpenRechargeCenter">
               <i class="el-icon-wallet"></i>
               <span slot="title">充值中心</span>
             </el-menu-item>
@@ -50,7 +51,7 @@
               <i class="el-icon-shopping-cart-full"></i>
               <span slot="title">购物车</span>
               <el-dialog title="购物车清单" :show-close="false" :visible.sync="dialogShopCartVisible"
-                @before-close="handleBeforeClose" :modal="false">
+                @before-close="handleBeforeClose" :modal="false" append-to-body>
                 <el-table ref="multipleTable" :data="shopCart" tooltip-effect="dark" style="width: 100%"
                   @selection-change="handleSelectionChange">
                   <el-table-column type="selection" width="55"></el-table-column>
@@ -81,11 +82,22 @@
         </div>
       </div>
     </el-drawer>
+
+    <!-- 书籍管理 -->
+    <BookManagement :visible="dialogBookManagementVisible" @close="handleCloseBookManagement"
+      @confirm="handleConfirmBookManagement"/>
+
+    <!-- 充值中心 -->
+    <RechargeCenter :visible="dialogRechargeCenterVisible" @close="handleCloseRechargeCenter"
+      @confirm="handleConfirmRechargeCenter"/>
+
   </div>
 </template>
 
 <script>
 import { mapState } from 'vuex';
+import BookManagement from './BookManagement.vue';
+import RechargeCenter from './RechargeCenter.vue';
 import axios from 'axios';
 export default {
   name: 'Header',
@@ -94,11 +106,16 @@ export default {
       drawer:false,
       dialogShopCartVisible:false,
       dialogPayVisible:false,
+      dialogBookManagementVisible:false,
+      dialogRechargeCenterVisible:false,
       selectedData:[],
       curShopCart:[],
       inputPsw:'',
       payCount:0
     }
+  },
+  components:{
+    BookManagement,RechargeCenter
   },
   props:['avatar','balance','shopCart'],
   computed: {
@@ -120,6 +137,28 @@ export default {
     }
   },
   methods:{
+    handleOpenRechargeCenter() {
+      this.dialogRechargeCenterVisible = true;
+    },
+    handleCloseRechargeCenter() {
+      this.dialogRechargeCenterVisible = false;
+    },
+    handleConfirmRechargeCenter() {
+      this.dialogRechargeCenterVisible = false;
+    },
+    handleOpenBookManagement() {
+      this.dialogBookManagementVisible = true; // 显示书籍管理对话框
+    },
+    handleCloseBookManagement() {
+      this.dialogBookManagementVisible = false; // 关闭书籍管理对话框
+    },
+    handleConfirmBookManagement() {
+      // 确认书籍管理逻辑
+      this.dialogBookManagementVisible = false;
+    },
+    triggerRefresh(){
+      this.$emit('refresh')
+    },
     //提交订单
     async handleCommitOrder(){
       //创建订单
@@ -137,7 +176,8 @@ export default {
           const result=response.data
           if(result.code==200){
             console.log('订单提交成功')
-            this.balance=this.balance-this.payCount//前端实现余额变化
+            this.$emit('update:balance', this.balance-this.payCount)//前端实现余额变化
+            this.triggerRefresh()//刷新页面
             this.handleDeleteShopCart()//删除购物车中已支付的商品
             this.dialogPayVisible=false//关闭支付窗口
             this.$message({
@@ -243,12 +283,12 @@ export default {
     },
     //删除购物车中选中的商品
     handleDeleteShopCart(){
-      this.curShopCart.forEach((item,index)=>{
-        if(this.selectedData.includes(item)){
-          console.log('删除了',item)
-          this.curShopCart.splice(index,1)
+      for (let i = this.curShopCart.length - 1; i >= 0; i--) {
+        if (this.selectedData.includes(this.curShopCart[i])) {
+          // console.log('删除了', this.curShopCart[i]);
+          this.curShopCart.splice(i, 1);
         }
-      })
+      }
       this.$message('删除成功')
     },
     handleCloseShopCart(){

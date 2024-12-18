@@ -1,6 +1,7 @@
 <template>
   <div>
     <el-container>
+
       <el-header style="margin:0 auto">
         <div>
           <el-image style="width: 1200px; height: 400px"
@@ -9,7 +10,7 @@
 
         </div>
       </el-header>
-      <el-container style="margin:300px 200px;margin-right: 260px">
+      <el-container  style="margin:300px 200px;margin-right: 260px">
         <el-aside style="margin-top: 100px;padding-left: 80px;width: 240px;">
           <div class="booksCount">
             <i class="el-icon-reading"></i>
@@ -32,10 +33,12 @@
         <el-main class="bookShow">
 
           <div v-for="(categoryItem,categoryIndex) in getBooks" :key="categoryIndex">
-            <span class="divisionName">{{ categoryNames[categoryIndex] }}</span><el-divider></el-divider>
+            <span class="divisionName">{{ categoryNames[categoryIndex] }}</span>
+            <el-button style="margin: 30px;font-size: 11px" plain @click="handleOpenCategoryDetail(categoryIndex)" size="small" type="primary">查看更多</el-button>
+            <el-divider></el-divider>
             <el-row v-for="(row, RowIndex) in categoryItem" :key="RowIndex">
               <el-col :span="4" v-for="(item, ColIndex) in row" :key="ColIndex" class="centered-col">
-                <div class="card-container" @click="handleClickBookItem(item)">
+                <div class="card-container" @click="handleClickBookItem(item,categoryIndex)">
                   <el-card :body-style="{ padding: '0px' }" style="width:150px;">
                     <img :src="item.image" class="image" style="width: 150px;height: 150px;">
                     <div style="padding: 14px;">
@@ -51,8 +54,7 @@
             </el-row>
           </div>
 
-          <el-dialog title="书籍详情" :visible.sync="dialogFormVisible" width="30%"
-          center>
+          <el-dialog title="书籍详情" :visible.sync="dialogFormVisible" width="30%" center>
             <el-form :model="currentItem">
               <el-form-item label="书名:" :label-width="formLabelWidth">
                 <el-input v-model="currentItem.bookname" disabled autocomplete="off"></el-input>
@@ -84,7 +86,14 @@
             <div slot="footer" class="dialog-footer">
               <el-button @click="dialogFormVisible = false">取 消</el-button>
               <el-button type="success" @click="handleAddToCart">添加购物车</el-button>
-              <el-button type="primary" @click="dialogFormVisible = false">购买</el-button>
+              <el-button type="primary" @click="handlePayDirectly">购买</el-button>
+              <!-- 支付dialog -->
+              <el-dialog width="30%" title="支付界面" :visible.sync="dialogPayVisible" append-to-body>
+                <span style="font-weight: bold; color: red; font-size: 16px;">请输入密码：</span>
+                <el-input placeholder="请输入密码" v-model="inputPsw" show-password></el-input>
+                <el-button @click="handleCancelPay">取消</el-button>
+                <el-button @click="handlePay">确定支付</el-button>
+              </el-dialog>
             </div>
           </el-dialog>
 
@@ -219,6 +228,7 @@
 
         </el-main>
       </el-container>
+      <router-view></router-view>
 
     </el-container>
   </div>
@@ -247,12 +257,15 @@ export default {
       },
       dialogFormVisible:false,
       dialogDescriVisible:false,
+      dialogPayVisible:false,
+      inputPsw:'',
       formLabelWidth:'120px',
       currentItem:{},
+      currentItemIndex:''//当前点击元素的类别
     }
   },
   computed: {
-    ...mapState(['token', 'userId', 'username']),
+    ...mapState(['token', 'userId', 'username','balance']),
     getBooks(){
       return {
         textbooks: this.getTextBooks||[],
@@ -327,6 +340,120 @@ export default {
 
   },
   methods: {
+    handleOpenCategoryDetail(index){
+      this.$router.push({
+        path:`/categorydetail/${index}`
+      })
+    },
+
+    //提交订单
+    async handleCommitOrder(){
+      //创建订单
+      var order=[{userId:this.userId,goodsId:this.currentItem.id}]
+      console.log("order:",order)
+
+      //提交订单
+      await axios.post(`${this.BASE_URL}/order/add`,order,{
+        headers:{
+          token:this.token
+        }
+      }).then(
+        response=>{
+          const result=response.data
+          if(result.code==200){
+            console.log('订单提交成功')
+            this.$store.commit('RenewBalance',this.balance-this.currentItem.price)//前端实现余额变化
+            //刷新页面
+            this.books[this.currentItemIndex].forEach((item,index)=>{
+              if(item==this.currentItem){
+                this.books[this.currentItemIndex].splice(index,1)
+              }
+            })
+            this.dialogPayVisible=false//关闭支付窗口
+            this.$message({
+            message:'支付成功',
+            type:'success'
+          })
+          }else{
+            console.log('订单提交失败')
+            this.$message({
+            message:result.message,
+            type:'error'
+          })
+          }
+        }
+      ).catch(
+        error=>{
+          console.log(error.message)
+          this.$message({
+            message:'支付失败',
+            type:'error'
+          })
+        }
+      )
+    },
+
+    //确认支付
+    async handlePay() {
+
+      //初步检验密码
+      if (!this.inputPsw.trim()) {
+        this.$message({
+          message: '密码不得为空',
+          type: 'warning'
+        })
+        return;
+      }
+      if (this.inputPsw.length < 6) {
+        this.$message({
+          message: '密码不得小于六位',
+          type: 'warning'
+        })
+        return;
+      }
+
+      const userLogin = {
+        username: this.username,
+        password: this.inputPsw
+      }
+      //后端检验密码
+      await axios.post(`${this.BASE_URL}/login`, userLogin, {
+        headers: {
+          token: this.token
+        }
+      }).then(
+        response => {
+          const result = response.data
+          if (result.code == 200) {
+            console.log('密码校验成功')
+            this.handleCommitOrder()
+            this.dialogFormVisible=false
+          } else {
+            this.$message({
+              message: '密码错误',
+              type: 'error'
+            })
+          }
+        }
+      ).catch(
+        error => {
+          console.log(error.message)
+          this.$message({
+            message: '密码错误',
+            type: 'error'
+          })
+        }
+      )
+
+    },
+    //取消支付
+    handleCancelPay() {
+      this.inputPsw = ''
+      this.dialogPayVisible = false
+    },
+    handlePayDirectly(){
+      this.dialogPayVisible=true
+    },
     handleAddToCart(){
       this.$store.commit('InsertShopCart',this.currentItem)
       this.$message('添加购物车成功')
@@ -335,8 +462,11 @@ export default {
     openDescri(){
       this.$alert(this.currentItem.description,'书籍描述')
     },
-    handleClickBookItem(item){
-      console.log('item:',item)
+    handleClickBookItem(item, index) {
+      // console.log('item:', item)
+      // console.log('index:', index)
+
+      this.currentItemIndex=index.replace(/book/g,"Book")
       this.currentItem=item
       this.dialogFormVisible=true
     },

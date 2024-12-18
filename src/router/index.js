@@ -6,6 +6,7 @@ import MainPage from "@/pages/MainPage/MainPage.vue";
 import UserCenter from "@/pages/UserCenter/UserCenter.vue";
 import Preface from "@/pages/Preface"
 import BookStall from "@/pages/BookStall"
+import CategoryDetail from "@/pages/CategoryDetail"
 
 export default new VueRouter({
   routes: [
@@ -32,6 +33,10 @@ export default new VueRouter({
     {
       path:'/bookstall',
       component:BookStall
+    },
+    {
+      path:'/categorydetail/:index',
+      component:CategoryDetail
     },
     {
       path: '*',

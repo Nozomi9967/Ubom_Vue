@@ -14,6 +14,9 @@ const mutations = {
   RenewShopCart(state,array){
     state.shopCart=array
   },
+  RenewBalance(state,newbalance){
+    state.balance=newbalance
+  },
   LoadBaseInfo(state) {
     state.token = localStorage.getItem('token')
     state.username = localStorage.getItem('userName')
