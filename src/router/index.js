@@ -7,6 +7,7 @@ import UserCenter from "@/pages/UserCenter/UserCenter.vue";
 import Preface from "@/pages/Preface"
 import BookStall from "@/pages/BookStall"
 import CategoryDetail from "@/pages/CategoryDetail"
+import Search from "@/pages/Search"
 
 export default new VueRouter({
   routes: [
@@ -37,6 +38,10 @@ export default new VueRouter({
     {
       path:'/categorydetail/:index',
       component:CategoryDetail
+    },
+    {
+      path:'/search',
+      component:Search
     },
     {
       path: '*',

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-dialog title="书籍详情" :visible.sync="visible" width="30%" @click="handleClose" center>
+    <el-dialog title="书籍详情" :visible.sync="visible" width="30%" @click="handleClose" :show-close="false" :close-on-click-modal="false" center>
       <el-form :model="currentItem">
         <el-form-item label="书名:" :label-width="formLabelWidth">
           <el-input v-model="currentItem.bookname" disabled autocomplete="off"></el-input>
@@ -30,7 +30,7 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button @click="handleCancel">取 消</el-button>
         <el-button type="success" @click="handleAddToCart">添加购物车</el-button>
         <el-button type="primary" @click="handlePayDirectly">购买</el-button>
         <!-- 支付dialog -->
@@ -52,10 +52,10 @@ export default {
   name: 'BookItemDetail',
   data(){
     return {
-      dialogFormVisible:false,
+      visible:false,
       dialogPayVisible:false,
       inputPsw:'',
-      formLabelWidth:120
+      formLabelWidth:'120'
     }
   },
   computed:{
@@ -69,6 +69,9 @@ export default {
     },
   },
   methods:{
+    handleCancel(){
+      this.$emit('close')
+    },
     handleClose(){
       this.$emit('close')
     },
@@ -92,11 +95,7 @@ export default {
           if(result.code==200){
             console.log('订单提交成功')
             //刷新页面
-            this.books[this.currentItemIndex].forEach((item,index)=>{
-              if(item==this.currentItem){
-                this.books[this.currentItemIndex].splice(index,1)
-              }
-            })
+            localStorage.setItem('isbuy',1)
             this.dialogPayVisible=false//关闭支付窗口
             this.$message({
             message:'支付成功',
@@ -155,7 +154,7 @@ export default {
           if (result.code == 200) {
             console.log('密码校验成功')
             this.handleCommitOrder()
-            this.dialogFormVisible=false
+            this.$emit('close')
           } else {
             this.$message({
               message: '密码错误',
@@ -185,7 +184,7 @@ export default {
     handleAddToCart(){
       this.$store.commit('InsertShopCart',this.currentItem)
       this.$message('添加购物车成功')
-      this.dialogFormVisible=false
+      this.$emit('close')
     },
     openDescri(){
       this.$alert(this.currentItem.description,'书籍描述')

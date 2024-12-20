@@ -8,6 +8,9 @@ const actions = {
 }
 
 const mutations = {
+  RevBuyState(state){
+    state.isbuy=true
+  },
   InsertShopCart(state,item){
     state.shopCart.push(item)
   },
@@ -40,7 +43,8 @@ const state = {
   token: localStorage.getItem('token') || '',
   avatar:localStorage.getItem('avatar')||'',
   balance:localStorage.getItem('balance')||'',
-  shopCart:[]
+  shopCart:[],
+  isbuy:false
 }
 export default new Vuex.Store({
   actions,

@@ -17,6 +17,7 @@
         class="el-menu-demo" mode="horizontal" @select="handleSelect">
         <el-menu-item index="1">首页</el-menu-item>
         <el-menu-item index="2">书摊</el-menu-item>
+        <el-menu-item index="3">搜索</el-menu-item>
       </el-menu>
     </div>
 
@@ -336,7 +337,10 @@ export default {
           console.log('书摊')
           this.$router.push('/bookstall')
           break
-
+        case '3':
+          console.log('搜索')
+          this.$router.push('/search')
+          break
       }
 
     },

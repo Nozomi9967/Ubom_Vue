@@ -1,8 +1,8 @@
 <template>
   <div>
     <el-container style="margin-left: 100px;margin-right: 100px;">
-      <el-aside width="200px">
-        <el-menu class="el-menu-vertical-demo" @select="handleSelect">
+      <el-aside width="200px" style="margin-top: 100px;">
+        <el-menu class="el-menu-vertical-demo" default-active="1" @select="handleSelect">
           <el-menu-item index="1">
             <i class="el-icon-menu"></i>
             <span slot="title">小说</span>
@@ -57,7 +57,8 @@
       </el-container>
     </el-container>
 
-    <BookItemDetail :visible="dialogBookItemDetailVisible" :currentItem="currentItem" @close="dialogBookItemDetailVisible=false"/>
+    <BookItemDetail :visible="dialogBookItemDetailVisible" :currentItem="currentItem"
+      @close="handleBookItemDetailClose" />
 
   </div>
 </template>
@@ -73,8 +74,9 @@ export default {
     return {
       curCategory: '',
       books: [],
-      dialogBookItemDetailVisible:false,
-      currentItem:{},
+      dialogBookItemDetailVisible: false,
+      currentItem: {},
+      isbuy: false,
       categoryMapping: {
         1: 'fiction',
         2: 'biography',
@@ -92,7 +94,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(['token']),
+    ...mapState(['token','isbuy']),
     getCategoryName() {
       switch (this.curCategory[0]) {
         case 'f':
@@ -136,9 +138,22 @@ export default {
     // this.handlePageChange()
   },
   methods: {
-    handleClickBookItem(item){
+    handleBookItemDetailClose() {
+      if (localStorage.getItem('isbuy')=='1') {
+        this.books.forEach((item, index) => {
+          if (item == this.currentItem) {
+            this.books.splice(index, 1)
+          }
+        })
+        localStorage.setItem('isbuy',0)
+        this.fetchCategoryBooks()//更新
+      }
+      this.dialogBookItemDetailVisible = false
+    },
+    handleClickBookItem(item) {
       console.log(item.bookname)
-      this.currentItem=item
+      this.currentItem = item
+      this.dialogBookItemDetailVisible = true
     },
     handleSelect(index) {
       // 根据index设置curCategory为对应的英文值
